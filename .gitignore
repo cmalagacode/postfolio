@@ -2,3 +2,4 @@
 .venv
 test_main.http
 postfolio.iml
+__pycache__/*
