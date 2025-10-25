@@ -1,5 +1,3 @@
-.idea
 .venv
-test_main.http
-postfolio.iml
-__pycache__/*
+__pycache__
+.env
