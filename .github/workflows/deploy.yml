@@ -1,0 +1,38 @@
+name: deploy.yml
+on:
+  push:
+    tags: v*
+jobs:
+  test-and-deploy-db-structure:
+    runs-on: ubuntu-latest
+    env:
+      POSTFOLIO_DATABASE_URL: ${{ secrets.POSTFOLIO_DATABASE_URL }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+      - name: Build & Execute
+        run: |
+          echo "POSTFOLIO_DATABASE_URL=${POSTFOLIO_DATABASE_URL}" > .env
+          docker compose up -d --build 
+      - name: Install Dev Dependencies
+        run: pip install -r requirements-dev.txt && pip install -r requirements.txt
+      - name: Run Unit Tests
+        run: pytest ./test/test.py
+  deploy:
+    needs: test-and-deploy-db-structure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Deployment
+        run: curl -X POST ${{ secrets.DEPLOY_HOOK }}
+  release:
+    needs: [ test-and-deploy-db-structure, deploy ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        

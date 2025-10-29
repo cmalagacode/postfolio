@@ -1,7 +1,14 @@
-FROM python:3.12-slim
+FROM python:3.13-slim
 WORKDIR /app
 COPY requirements.txt .
+COPY requirements-dev.txt .
 RUN pip install -r requirements.txt
-COPY . .
+COPY ./model/ ./model/
+COPY ./repositories/ ./repositories/
+COPY ./router/ ./router/
+COPY ./schema/ ./schema/
+COPY ./services/ ./services/
+COPY ./test/ ./test/
+COPY app.py .
 EXPOSE 8080
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
