@@ -3,7 +3,7 @@ on:
   push:
     tags: v*
 jobs:
-  test-and-deploy-db-structure:
+  test-app:
     runs-on: ubuntu-latest
     env:
       POSTFOLIO_DATABASE_URL: ${{ secrets.POSTFOLIO_DATABASE_URL }}
@@ -21,13 +21,13 @@ jobs:
       - name: Run Unit Tests
         run: pytest -v ./test/test.py
   deploy:
-    needs: test-and-deploy-db-structure
+    needs: test-app
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Deployment
         run: curl -X POST ${{ secrets.DEPLOY_HOOK }}
   release:
-    needs: [ test-and-deploy-db-structure, deploy ]
+    needs: [ test-app, deploy ]
     runs-on: ubuntu-latest
     steps:
       - name: Create GitHub Release
