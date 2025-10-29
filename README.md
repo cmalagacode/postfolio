@@ -35,3 +35,5 @@ pip install -r ./requirements.txt
 4. psycopg2-binary
 5. asyncpg
 6. bcrypt
+7. greenlet
+8. pytest
