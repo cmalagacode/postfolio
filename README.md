@@ -36,3 +36,4 @@ pip install -r ./requirements.txt
 5. asyncpg
 6. bcrypt
 7. greenlet
+8. pytest
