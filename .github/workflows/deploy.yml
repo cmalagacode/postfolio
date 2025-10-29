@@ -15,7 +15,7 @@ jobs:
           echo "POSTFOLIO_DATABASE_URL=${POSTFOLIO_DATABASE_URL}" > .env
           docker compose up -d --build 
       - name: Install Dev Dependencies
-        run: pip install -r requirements-dev.txt
+        run: pip install -r requirements-dev.txt && pip install -r requirements.txt
       - name: Run Unit Tests
         run: pytest ./test/test.py
   deploy:
