@@ -5,12 +5,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import exc
 from schema import user as user_schema
 from fastapi import status
+from pydantic import EmailStr
+from model.settings import Timezones
+from model.user import GetUserResponse
 
 
 async def save(
-        username: str, email: str, password: str, 
+        username: str, email: str | EmailStr, password: str,
         first_name: str, last_name: str, middle_name: str,
-        timezone: str
+        timezone: str | Timezones
     ) -> int:
     if os.getenv("ENV", "testing") == "prod":
         async with AsyncSession(ENGINE_ASYNC) as session:
@@ -61,4 +64,18 @@ async def save(
                 session.rollback()
                 return status.HTTP_409_CONFLICT
 
-
+async def get_user(user_id: int) -> tuple[dict, int]:
+    if os.getenv("ENV", "testing") == "prod":
+        async with AsyncSession(ENGINE_ASYNC) as session:
+            user = await session.get(user_schema.BlogUser, user_id)
+            if user:
+                return GetUserResponse.model_validate(user).model_dump(), status.HTTP_200_OK
+            else:
+                return {}, status.HTTP_404_NOT_FOUND
+    else:
+        with Session(ENGINE_SYNC) as session:
+            user = session.get(user_schema.BlogUser, user_id)
+            if user:
+                return GetUserResponse.model_validate(user).model_dump(), status.HTTP_200_OK
+            else:
+                return {}, status.HTTP_404_NOT_FOUND

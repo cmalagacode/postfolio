@@ -13,3 +13,6 @@ async def create_user(user: user.UserCreate) -> int:
         middle_name=user.middle_name,
         timezone=user.timezone
     )
+
+async def get_user(user_id: int):
+    return await user_repo.get_user(user_id)
