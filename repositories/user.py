@@ -2,7 +2,7 @@ import os
 from schema.connection import ENGINE_ASYNC, ENGINE_SYNC
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import exc
+from sqlalchemy import exc, select, func
 from schema import user as user_schema
 from fastapi import status
 from pydantic import EmailStr
@@ -69,13 +69,47 @@ async def get_user(user_id: int) -> tuple[dict, int]:
         async with AsyncSession(ENGINE_ASYNC) as session:
             user = await session.get(user_schema.BlogUser, user_id)
             if user:
-                return GetUserResponse.model_validate(user).model_dump(), status.HTTP_200_OK
+                return GetUserResponse.model_validate(user).model_dump(by_alias=True), status.HTTP_200_OK
             else:
                 return {}, status.HTTP_404_NOT_FOUND
     else:
         with Session(ENGINE_SYNC) as session:
             user = session.get(user_schema.BlogUser, user_id)
             if user:
-                return GetUserResponse.model_validate(user).model_dump(), status.HTTP_200_OK
+                return GetUserResponse.model_validate(user).model_dump(by_alias=True), status.HTTP_200_OK
             else:
                 return {}, status.HTTP_404_NOT_FOUND
+
+async def get_all_users(limit: int, offset: int) -> tuple[dict, int]:
+    if os.getenv("ENV", "testing") == "prod":
+        async with AsyncSession(ENGINE_ASYNC) as session:
+            stmt = select(user_schema.BlogUser).order_by(user_schema.BlogUser.id).limit(limit).offset(offset)
+            users = await session.execute(stmt)
+            result = users.scalars().all()
+            if len(result) > 0:
+                return {"bundle": [GetUserResponse.model_validate(user).model_dump(by_alias=True) for user in result]}, status.HTTP_200_OK
+            else:
+                return {}, status.HTTP_404_NOT_FOUND
+    else:
+        with Session(ENGINE_SYNC) as session:
+            stmt = select(user_schema.BlogUser).order_by(user_schema.BlogUser.id).limit(limit).offset(offset)
+            users = session.execute(stmt)
+            result = users.scalars().all()
+            if len(result) > 0:
+                return {"bundle": [GetUserResponse.model_validate(user).model_dump(by_alias=True) for user in result]}, status.HTTP_200_OK
+            else:
+                return {}, status.HTTP_404_NOT_FOUND
+
+async def get_user_count() -> int:
+    if os.getenv("ENV", "testing") == "prod":
+        async with AsyncSession(ENGINE_ASYNC) as session:
+            stmt = select(func.count()).select_from(user_schema.BlogUser)
+            count = await session.execute(stmt)
+            total_count = count.scalar_one()
+            return total_count
+    else:
+        with Session(ENGINE_SYNC) as session:
+            stmt = select(func.count()).select_from(user_schema.BlogUser)
+            count = session.execute(stmt)
+            total_count = count.scalar_one()
+            return total_count

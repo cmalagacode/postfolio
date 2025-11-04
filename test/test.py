@@ -7,7 +7,7 @@ from schema.user import Base
 from schema.connection import ENGINE_SYNC
 from fastapi.testclient import TestClient
 from model.settings import PrivacySettings, ProfileTheme, Languages, Timezones
-from model.user import UserCreate
+from model.user import UserCreate, GetUserResponse
 from schema.database import initialize_database
 
 client = TestClient(app)
@@ -124,7 +124,7 @@ def test_mock_user_create_validation():
 # pydantics tests
 def test_pydantics_create_user_valid():
     """
-    Function tests a valid creation of a user via post request.
+    Function tests pydantics model for create user.
     """
     data = {
         "username": "example",
@@ -363,3 +363,260 @@ def test_pydantics_create_user_invalid_timezone():
     with pytest.raises(ValidationError):
         UserCreate(**test2)
 
+def test_pydantics_get_user_valid():
+    """
+    Function tests pydantics model for get user.
+    """
+    bio = "This is an example bio."
+    email = "example@email.com"
+    first_name = "John"
+    id = 1
+    is_active = True
+    last_name = "Doe"
+    middle_name = "D"
+    privacy_settings = PrivacySettings.PUBLIC
+    profile_language = Languages.ENGLISH
+    profile_picture_url = None
+    profile_theme = ProfileTheme.SYSTEM_DEFAULT
+    timezone = Timezones.EST
+    username = "exampleUser"
+    data = {
+        "bio": bio,
+        "email": email,
+        "first_name": first_name,
+        "id": id,
+        "is_active": is_active,
+        "last_name": last_name,
+        "middle_name": middle_name,
+        "privacy_settings": privacy_settings,
+        "profile_language": profile_language,
+        "profile_picture_url": profile_picture_url,
+        "profile_theme": profile_theme,
+        "timezone": timezone,
+        "username": username
+    }
+
+    user = GetUserResponse(**data)
+    assert user.bio == bio
+    assert user.email == email
+    assert user.first_name == first_name
+    assert user.id == id
+    assert user.is_active == is_active
+    assert user.last_name == last_name
+    assert user.middle_name == middle_name
+    assert user.privacy_settings == privacy_settings
+    assert user.profile_language == profile_language
+    assert user.profile_picture_url == profile_picture_url
+    assert user.profile_theme == profile_theme
+    assert user.timezone == timezone
+    assert user.username == username
+
+def test_pydantics_get_user_invalid_bio():
+    """
+    Function tests if pydantic validation error occurs
+    """
+    bio = "T" * 201
+    email = "e@email.com"
+    first_name = "J"
+    id = 2
+    is_active = True
+    last_name = "D"
+    middle_name = "E"
+    privacy_settings = PrivacySettings.FRIENDS_ONLY
+    profile_language = Languages.SPANISH
+    profile_picture_url = "s3://example-bucket/example-picture.png"
+    profile_theme = ProfileTheme.LIGHT
+    timezone = Timezones.MST
+    username = "example89232"
+    data = {
+        "bio": bio,
+        "email": email,
+        "first_name": first_name,
+        "id": id,
+        "is_active": is_active,
+        "last_name": last_name,
+        "middle_name": middle_name,
+        "privacy_settings": privacy_settings,
+        "profile_language": profile_language,
+        "profile_picture_url": profile_picture_url,
+        "profile_theme": profile_theme,
+        "timezone": timezone,
+        "username": username
+    }
+    with pytest.raises(ValidationError):
+        GetUserResponse(**data)
+
+def test_pydantics_get_user_invalid_email():
+    """
+    Function tests if pydantic validation error occurs
+    """
+    bio = ""
+    email = "email.com"
+    first_name = "J"
+    id = 3
+    is_active = True
+    last_name = "D"
+    middle_name = "E"
+    privacy_settings = PrivacySettings.FRIENDS_ONLY
+    profile_language = Languages.SPANISH
+    profile_picture_url = "s3://example-bucket/example-picture.png"
+    profile_theme = ProfileTheme.LIGHT
+    timezone = Timezones.MST
+    username = "example89232"
+    data = {
+        "bio": bio,
+        "email": email,
+        "first_name": first_name,
+        "id": id,
+        "is_active": is_active,
+        "last_name": last_name,
+        "middle_name": middle_name,
+        "privacy_settings": privacy_settings,
+        "profile_language": profile_language,
+        "profile_picture_url": profile_picture_url,
+        "profile_theme": profile_theme,
+        "timezone": timezone,
+        "username": username
+    }
+    with pytest.raises(ValidationError):
+        GetUserResponse(**data)
+
+def test_pydantics_get_user_invalid_first_name():
+    """
+    Function tests if pydantic validation error occurs
+    """
+    bio = ""
+    email = "example@email.com"
+    first_name = "J" * 51
+    id = 4
+    is_active = True
+    last_name = "D"
+    middle_name = "E"
+    privacy_settings = PrivacySettings.FRIENDS_ONLY
+    profile_language = Languages.SPANISH
+    profile_picture_url = "s3://example-bucket/example-picture.png"
+    profile_theme = ProfileTheme.LIGHT
+    timezone = Timezones.MST
+    username = "example89232"
+    data = {
+        "bio": bio,
+        "email": email,
+        "first_name": first_name,
+        "id": id,
+        "is_active": is_active,
+        "last_name": last_name,
+        "middle_name": middle_name,
+        "privacy_settings": privacy_settings,
+        "profile_language": profile_language,
+        "profile_picture_url": profile_picture_url,
+        "profile_theme": profile_theme,
+        "timezone": timezone,
+        "username": username
+    }
+    with pytest.raises(ValidationError):
+        GetUserResponse(**data)
+
+def test_pydantics_get_user_invalid_last_name():
+    """
+    Function tests if pydantic validation error occurs
+    """
+    bio = ""
+    email = "example@email.com"
+    first_name = "J"
+    id = 5
+    is_active = True
+    last_name = "D" * 51
+    middle_name = "E"
+    privacy_settings = PrivacySettings.FRIENDS_ONLY
+    profile_language = Languages.SPANISH
+    profile_picture_url = "s3://example-bucket/example-picture.png"
+    profile_theme = ProfileTheme.LIGHT
+    timezone = Timezones.MST
+    username = "example89232"
+    data = {
+        "bio": bio,
+        "email": email,
+        "first_name": first_name,
+        "id": id,
+        "is_active": is_active,
+        "last_name": last_name,
+        "middle_name": middle_name,
+        "privacy_settings": privacy_settings,
+        "profile_language": profile_language,
+        "profile_picture_url": profile_picture_url,
+        "profile_theme": profile_theme,
+        "timezone": timezone,
+        "username": username
+    }
+    with pytest.raises(ValidationError):
+        GetUserResponse(**data)
+
+def test_pydantics_get_user_invalid_middle_name():
+    """
+    Function tests if pydantic validation error occurs
+    """
+    bio = ""
+    email = "example@email.com"
+    first_name = "J"
+    id = 6
+    is_active = True
+    last_name = "D"
+    middle_name = "E" * 51
+    privacy_settings = PrivacySettings.FRIENDS_ONLY
+    profile_language = Languages.SPANISH
+    profile_picture_url = "s3://example-bucket/example-picture.png"
+    profile_theme = ProfileTheme.LIGHT
+    timezone = Timezones.MST
+    username = "example89232"
+    data = {
+        "bio": bio,
+        "email": email,
+        "first_name": first_name,
+        "id": id,
+        "is_active": is_active,
+        "last_name": last_name,
+        "middle_name": middle_name,
+        "privacy_settings": privacy_settings,
+        "profile_language": profile_language,
+        "profile_picture_url": profile_picture_url,
+        "profile_theme": profile_theme,
+        "timezone": timezone,
+        "username": username
+    }
+    with pytest.raises(ValidationError):
+        GetUserResponse(**data)
+
+def test_pydantics_get_user_invalid_username():
+    """
+    Function tests if pydantic validation error occurs
+    """
+    bio = ""
+    email = "example@email.com"
+    first_name = "J"
+    id = 7
+    is_active = True
+    last_name = "D"
+    middle_name = "E"
+    privacy_settings = PrivacySettings.FRIENDS_ONLY
+    profile_language = Languages.SPANISH
+    profile_picture_url = "s3://example-bucket/example-picture.png"
+    profile_theme = ProfileTheme.LIGHT
+    timezone = Timezones.MST
+    username = "e" * 31
+    data = {
+        "bio": bio,
+        "email": email,
+        "first_name": first_name,
+        "id": id,
+        "is_active": is_active,
+        "last_name": last_name,
+        "middle_name": middle_name,
+        "privacy_settings": privacy_settings,
+        "profile_language": profile_language,
+        "profile_picture_url": profile_picture_url,
+        "profile_theme": profile_theme,
+        "timezone": timezone,
+        "username": username
+    }
+    with pytest.raises(ValidationError):
+        GetUserResponse(**data)

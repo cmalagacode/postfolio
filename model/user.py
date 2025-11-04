@@ -1,6 +1,10 @@
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from model.settings import Timezones, PrivacySettings, Languages, ProfileTheme
 
+def to_camel(name: str) -> str:
+    parts = name.split("_")
+    return parts[0] + "".join(word.capitalize() for word in parts[1:])
+
 class UserCreate(BaseModel):
     username: str = Field(min_length=7, max_length=30)
     email: EmailStr
@@ -11,7 +15,7 @@ class UserCreate(BaseModel):
     timezone: Timezones = Field(default=Timezones.UTC)
 
 class GetUserResponse(BaseModel):
-    bio: str = Field(min_length=0, max_length=1000)
+    bio: str = Field(min_length=0, max_length=200)
     email: EmailStr
     first_name: str = Field(min_length=1, max_length=50)
     id: int
@@ -25,4 +29,4 @@ class GetUserResponse(BaseModel):
     timezone: Timezones
     username: str = Field(min_length=7, max_length=30)
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, alias_generator=to_camel, populate_by_name=True)
