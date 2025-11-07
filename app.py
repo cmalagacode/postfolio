@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from router import user_router
+from router import user_router, post_router
 from fastapi.middleware.cors import CORSMiddleware
 from schema.database import initialize_database
 from contextlib import asynccontextmanager
@@ -23,5 +23,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(user_router.route)
+app.include_router(post_router.route)
 
 

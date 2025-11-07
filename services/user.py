@@ -15,7 +15,7 @@ async def create_user(user: user.UserCreate) -> int:
         timezone=user.timezone
     )
 
-async def get_user(user_id: int):
+async def get_user(user_id: int) -> tuple[dict, int]:
     return await user_repo.get_user(user_id)
 
 async def get_all_users(limit: int, offset: int, request: Request):

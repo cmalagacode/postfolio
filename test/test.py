@@ -47,6 +47,54 @@ def test_create_user_endpoint(setup_db):
     assert resp.status_code == 409
     assert resp.json()["message"] == "error creating user"
 
+def test_get_user_endpoint(setup_db):
+    """
+    Function tests user creation and getting user via fastapi TestClient.
+    """
+    post_resp = client.post("/users", json={
+        "username": "example",
+        "email": "example@example.com",
+        "password": "password",
+        "firstName": "John",
+        "lastName": "Doe",
+        "middleName": "D",
+        "timezone": "EST"
+    })
+
+    assert post_resp.status_code == 201
+
+    get_all_user_resp = client.get("/users/all", params={
+        "limit": 1,
+        "offset": 0
+    })
+
+    assert get_all_user_resp.status_code == 200
+
+    get_user_resp = client.get("/users", params={
+        "id": get_all_user_resp.json()["bundle"][0]["id"]
+    })
+
+    assert get_user_resp.status_code == 200
+
+def test_create_post(setup_db):
+    """
+    Function tests post creation via fastapi TestClient.
+    """
+    create_post_resp = client.post("/posts", json={
+        "body": "Test Post",
+        "categories": ["NUTRITION", "FITNESS", "FOOD"],
+        "commentsAllowed": True,
+        "embeddedMediaUrl": ["s3://example-bucket/example.mp4"],
+        "featuredImageUrl": "s3://example-bucket/example.png",
+        "status": "DRAFT",
+        "title": "Test Title",
+        "tags": ["#food", "#nutrition", "#fitness"],
+        "userId": 1,
+        "visibility": "PRIVATE"
+    })
+
+    assert create_post_resp.status_code == 201
+    assert create_post_resp.json()["message"] == "post created successfully"
 
 # settings tests
 def test_enum():
@@ -233,7 +281,7 @@ def test_pydantics_create_user_invalid_username():
         "username": "",
         "email": "example@example.com",
         "password": "password",
-        "firstName": "J" * 51,
+        "firstName": "J",
         "lastName": "D",
         "middleName": "D",
         "timezone": "EST"
@@ -263,7 +311,7 @@ def test_pydantics_create_user_invalid_firstname():
         "username": "example",
         "email": "example@example.com",
         "password": "password",
-        "firstName": "J" * 51,
+        "firstName": "J" * 101,
         "lastName": "D",
         "middleName": "D",
         "timezone": "EST"
@@ -294,7 +342,7 @@ def test_pydantics_create_user_invalid_lastname():
         "email": "example@example.com",
         "password": "password",
         "firstName": "John",
-        "lastName": "D" * 51,
+        "lastName": "D" * 101,
         "middleName": "D",
         "timezone": "EST"
     }
@@ -326,7 +374,7 @@ def test_pydantics_create_user_invalid_middlename():
         "password": "password",
         "firstName": "John",
         "lastName": "Doe",
-        "middleName": "D" * 51,
+        "middleName": "D" * 101,
         "timezone": "EST"
     }
 
@@ -487,7 +535,7 @@ def test_pydantics_get_user_invalid_first_name():
     """
     bio = ""
     email = "example@email.com"
-    first_name = "J" * 51
+    first_name = "J" * 101
     id = 4
     is_active = True
     last_name = "D"
@@ -525,7 +573,7 @@ def test_pydantics_get_user_invalid_last_name():
     first_name = "J"
     id = 5
     is_active = True
-    last_name = "D" * 51
+    last_name = "D" * 101
     middle_name = "E"
     privacy_settings = PrivacySettings.FRIENDS_ONLY
     profile_language = Languages.SPANISH
@@ -561,7 +609,7 @@ def test_pydantics_get_user_invalid_middle_name():
     id = 6
     is_active = True
     last_name = "D"
-    middle_name = "E" * 51
+    middle_name = "E" * 101
     privacy_settings = PrivacySettings.FRIENDS_ONLY
     profile_language = Languages.SPANISH
     profile_picture_url = "s3://example-bucket/example-picture.png"

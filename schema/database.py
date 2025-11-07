@@ -1,6 +1,5 @@
-from schema.user import Base
+from schema.base import Base
 from schema.connection import ENGINE_SYNC
-
 
 def initialize_database():
     print("Creating database tables...")
