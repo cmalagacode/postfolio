@@ -100,6 +100,38 @@ async def get_all_users(limit: int, offset: int) -> tuple[dict, int]:
             else:
                 return {}, status.HTTP_404_NOT_FOUND
 
+async def get_user_by_username(username: str) -> tuple[dict, int]:
+    if os.getenv("ENV", "testing") == "prod":
+        async with AsyncSession(ENGINE_ASYNC) as session:
+            stmt = select(user_schema.BlogUser).where(user_schema.BlogUser.username == username)
+            result = await session.execute(stmt)
+            user = result.scalar_one_or_none()
+            if user:
+                return {
+                    "id": user.id,
+                    "username": user.username,
+                    "password": user.password,
+                    "email": user.email,
+                    "is_active": user.is_active,
+                }, status.HTTP_200_OK
+            else:
+                return {}, status.HTTP_404_NOT_FOUND
+    else:
+        with Session(ENGINE_SYNC) as session:
+            stmt = select(user_schema.BlogUser).where(user_schema.BlogUser.username == username)
+            result = session.execute(stmt)
+            user = result.scalar_one_or_none()
+            if user:
+                return {
+                    "id": user.id,
+                    "username": user.username,
+                    "password": user.password,
+                    "email": user.email,
+                    "is_active": user.is_active,
+                }, status.HTTP_200_OK
+            else:
+                return {}, status.HTTP_404_NOT_FOUND
+
 async def get_user_count() -> int:
     if os.getenv("ENV", "testing") == "prod":
         async with AsyncSession(ENGINE_ASYNC) as session:
