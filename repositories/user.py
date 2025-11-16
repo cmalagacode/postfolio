@@ -15,7 +15,7 @@ async def save(
         first_name: str, last_name: str, middle_name: str,
         timezone: str | Timezones
     ) -> int:
-    if os.getenv("ENV", "testing") == "prod":
+    if os.getenv("POSTFOLIO_ENV", "DEV") == "PROD":
         async with AsyncSession(ENGINE_ASYNC) as session:
             try:
                 blog_user = user_schema.BlogUser(
@@ -65,7 +65,7 @@ async def save(
                 return status.HTTP_409_CONFLICT
 
 async def get_user(user_id: int) -> tuple[dict, int]:
-    if os.getenv("ENV", "testing") == "prod":
+    if os.getenv("POSTFOLIO_ENV", "DEV") == "PROD":
         async with AsyncSession(ENGINE_ASYNC) as session:
             user = await session.get(user_schema.BlogUser, user_id)
             if user:
@@ -81,7 +81,7 @@ async def get_user(user_id: int) -> tuple[dict, int]:
                 return {}, status.HTTP_404_NOT_FOUND
 
 async def get_all_users(limit: int, offset: int) -> tuple[dict, int]:
-    if os.getenv("ENV", "testing") == "prod":
+    if os.getenv("POSTFOLIO_ENV", "DEV") == "PROD":
         async with AsyncSession(ENGINE_ASYNC) as session:
             stmt = select(user_schema.BlogUser).order_by(user_schema.BlogUser.id).limit(limit).offset(offset)
             users = await session.execute(stmt)
@@ -101,7 +101,7 @@ async def get_all_users(limit: int, offset: int) -> tuple[dict, int]:
                 return {}, status.HTTP_404_NOT_FOUND
 
 async def get_user_by_username(username: str) -> tuple[dict, int]:
-    if os.getenv("ENV", "testing") == "prod":
+    if os.getenv("POSTFOLIO_ENV", "DEV") == "PROD":
         async with AsyncSession(ENGINE_ASYNC) as session:
             stmt = select(user_schema.BlogUser).where(user_schema.BlogUser.username == username)
             result = await session.execute(stmt)
@@ -133,7 +133,7 @@ async def get_user_by_username(username: str) -> tuple[dict, int]:
                 return {}, status.HTTP_404_NOT_FOUND
 
 async def get_user_count() -> int:
-    if os.getenv("ENV", "testing") == "prod":
+    if os.getenv("POSTFOLIO_ENV", "DEV") == "PROD":
         async with AsyncSession(ENGINE_ASYNC) as session:
             stmt = select(func.count()).select_from(user_schema.BlogUser)
             count = await session.execute(stmt)
