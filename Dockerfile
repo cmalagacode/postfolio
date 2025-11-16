@@ -3,10 +3,12 @@ WORKDIR /app
 COPY requirements.txt .
 COPY requirements-dev.txt .
 RUN pip install -r requirements.txt
+COPY ./config ./config/
 COPY ./model/ ./model/
 COPY ./repositories/ ./repositories/
 COPY ./router/ ./router/
 COPY ./schema/ ./schema/
+COPY ./security ./security/
 COPY ./services/ ./services/
 COPY ./test/ ./test/
 COPY app.py .

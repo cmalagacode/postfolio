@@ -27,6 +27,10 @@
 ```bash
 pip install -r ./requirements.txt
 ```
+## Docker 🚀
+```bash
+docker compose build --no-cache
+```
 
 ## 📖 Libraries
 1. fastapi
@@ -41,6 +45,9 @@ pip install -r ./requirements.txt
 ## Security 
 - JWT + Username + Password
 ## Uvicorn
-- uvicorn app:app --reload
+- uvicorn app:app --port 8080 --reload
+
+## Oauth2 Form
+- "Content-Type": "application/x-www-form-urlencoded"
 
 

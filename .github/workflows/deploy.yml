@@ -6,17 +6,17 @@ jobs:
   test-app:
     runs-on: ubuntu-latest
     env:
-      POSTFOLIO_DATABASE_URL: ${{ secrets.POSTFOLIO_DATABASE_URL }}
-      ENV: ${{ secrets.ENV }}
+      POSTFOLIO_ENV: ${{ secrets.POSTFOLIO_ENV }}
       POSTFOLIO_SECRET_KEY: ${{ secrets.POSTFOLIO_SECRET_KEY }}
+      POSTFOLIO_DATABASE_URL: PLACE_HOLDER
     steps:
       - name: Checkout Code
         uses: actions/checkout@v5
       - name: Build & Execute
         run: |
-          echo "POSTFOLIO_DATABASE_URL=${POSTFOLIO_DATABASE_URL}" > .env
-          echo "ENV=${ENV}" >> .env
+          echo "POSTFOLIO_ENV=${POSTFOLIO_ENV}" >> .env
           echo "POSTFOLIO_SECRET_KEY=${POSTFOLIO_SECRET_KEY}" >> .env
+          echo "POSTFOLIO_DATABASE_URL=${POSTFOLIO_DATABASE_URL}" >> .env
           docker compose up -d --build 
       - name: Install Dependencies
         run: pip install -r requirements-dev.txt && pip install -r requirements.txt
