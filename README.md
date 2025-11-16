@@ -37,3 +37,10 @@ pip install -r ./requirements.txt
 6. bcrypt
 7. greenlet
 8. pytest
+
+## Security 
+- JWT + Username + Password
+## Uvicorn
+- uvicorn app:app --reload
+
+

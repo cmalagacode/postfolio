@@ -17,6 +17,7 @@ def setup_db():
     Base.metadata.drop_all(bind=ENGINE_SYNC)
     initialize_database()
 
+
 # request validation in fastapi TestClient
 def test_create_user_endpoint(setup_db):
     """
@@ -63,16 +64,20 @@ def test_get_user_endpoint(setup_db):
 
     assert post_resp.status_code == 201
 
+    token = client.post("/login", data={"username": "example", "password": "password", "grant_type": "password"})
+    access_token = token.json()["access_token"]
+    headers = {"Authorization": f"Bearer {access_token}"}
+
     get_all_user_resp = client.get("/users/all", params={
         "limit": 1,
         "offset": 0
-    })
+    }, headers=headers)
 
     assert get_all_user_resp.status_code == 200
 
     get_user_resp = client.get("/users", params={
         "id": get_all_user_resp.json()["bundle"][0]["id"]
-    })
+    }, headers=headers)
 
     assert get_user_resp.status_code == 200
 
@@ -80,6 +85,22 @@ def test_create_post(setup_db):
     """
     Function tests post creation via fastapi TestClient.
     """
+    post_resp = client.post("/users", json={
+        "username": "example",
+        "email": "example@example.com",
+        "password": "password",
+        "firstName": "John",
+        "lastName": "Doe",
+        "middleName": "D",
+        "timezone": "EST"
+    })
+
+    assert post_resp.status_code == 201
+
+    token = client.post("/login", data={"username": "example", "password": "password", "grant_type": "password"})
+    access_token = token.json()["access_token"]
+    headers = {"Authorization": f"Bearer {access_token}"}
+
     create_post_resp = client.post("/posts", json={
         "body": "Test Post",
         "categories": ["NUTRITION", "FITNESS", "FOOD"],
@@ -91,7 +112,7 @@ def test_create_post(setup_db):
         "tags": ["#food", "#nutrition", "#fitness"],
         "userId": 1,
         "visibility": "PRIVATE"
-    })
+    }, headers=headers)
 
     assert create_post_resp.status_code == 201
     assert create_post_resp.json()["message"] == "post created successfully"
